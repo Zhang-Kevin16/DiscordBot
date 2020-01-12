@@ -63,13 +63,12 @@ public class Bot extends ListenerAdapter {
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
         VoiceChannel channel = event.getChannelLeft();
-        if (channel.getMembers().isEmpty()) {
-            Guild guild = event.getGuild();
-            AudioManager manager = guild.getAudioManager();
+        Guild guild = event.getGuild();
+        AudioManager manager = guild.getAudioManager();
+        if (channel.getMembers().size() == 1 && channel.getIdLong() == manager.getConnectedChannel().getIdLong()) {
             if (manager.isConnected())
                 manager.closeAudioConnection();
         }
-        System.out.println(channel.getMembers().size());
     }
 
     private void seal(MessageReceivedEvent event) {
