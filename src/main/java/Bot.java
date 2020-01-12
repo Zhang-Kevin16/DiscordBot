@@ -30,7 +30,7 @@ public class Bot extends ListenerAdapter {
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
-        String token = "NjY1NDA1MTk0MTMzMDQ1MjU5.XhqNgw.eM6-DtL3rnVRLQMMGb-X0EJDBzc";
+        String token = "NjY1NDA1MTk0MTMzMDQ1MjU5.XhqORw.t2jDYQrpok227hFE1LuV-guqSes";
         System.out.println(token);
         JDA bot = new JDABuilder(token).build();
         bot.awaitReady();
