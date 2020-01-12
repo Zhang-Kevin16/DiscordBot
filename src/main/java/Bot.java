@@ -85,7 +85,7 @@ public class Bot extends ListenerAdapter {
 
     private void at(MessageReceivedEvent event) {
         int times = (int)(Math.random() * 10.0 + 10.0);
-        StringBuilder msg = new StringBuilder("/tts ");
+        StringBuilder msg = new StringBuilder();
         for (int i = 0; i < times; ++i)
             msg.append("@");
         MessageBuilder msgSend = new MessageBuilder(msg);
