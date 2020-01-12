@@ -9,16 +9,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
 
 public class Bot extends ListenerAdapter {
     AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
@@ -57,6 +55,8 @@ public class Bot extends ListenerAdapter {
                 stop(event);
             else if (msg.equalsIgnoreCase("!seno"))
                 seno(event);
+            else if (msg.equalsIgnoreCase("!bocchi"))
+                bocchi(event);
         }
     }
 
@@ -69,6 +69,10 @@ public class Bot extends ListenerAdapter {
             if (manager.isConnected())
                 manager.closeAudioConnection();
         }
+    }
+
+    private void bocchi(MessageReceivedEvent event) {
+        sendMessage(event, "<:Bocchi1:638528475069939725><:Bocchi2:638528488726462498>\n<:Bocchi3:638528499187187712><:Bocchi4:638528508888481817>");
     }
 
     private void seal(MessageReceivedEvent event) {
@@ -165,4 +169,6 @@ public class Bot extends ListenerAdapter {
             if (!manager.isConnected())
                 manager.openAudioConnection(channel);
         }
+
+
 }
