@@ -69,6 +69,7 @@ public class Bot extends ListenerAdapter {
             if (manager.isConnected())
                 manager.closeAudioConnection();
         }
+        System.out.println(channel.getMembers().size());
     }
 
     private void seal(MessageReceivedEvent event) {
