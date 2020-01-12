@@ -30,7 +30,7 @@ public class Bot extends ListenerAdapter {
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
-        JDA bot = new JDABuilder("NjY1NDA1MTk0MTMzMDQ1MjU5.XhlKkw.JVoFbRX5y-fDVw7G1Y3pILp-XwE").build();
+        JDA bot = new JDABuilder("NjY1NDA1MTk0MTMzMDQ1MjU5.XhqJcQ.Gp0-CLGejeQ7_0Jx90RhStamuZA").build();
         bot.awaitReady();
         bot.addEventListener(new Bot());
     }
