@@ -19,7 +19,7 @@ dependencies {
 }
 
 ext {
-    javaMainClass = "com.xd.sample.Bot"
+    javaMainClass = "Bot"
 }
 
 application {
