@@ -55,7 +55,7 @@ public class Bot extends ListenerAdapter {
                 stop(event);
             else if (msg.equalsIgnoreCase("!seno"))
                 seno(event);
-            else if (msg.equalsIgnoreCase("!bocchi"))
+            else if (msg.equalsIgnoreCase("!bocchi") || msg.equalsIgnoreCase("!tomodachininaritai"))
                 bocchi(event);
         }
     }
