@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -87,7 +88,9 @@ public class Bot extends ListenerAdapter {
         StringBuilder msg = new StringBuilder("/tts ");
         for (int i = 0; i < times; ++i)
             msg.append("@");
-        sendMessage(event, msg.toString());
+        MessageBuilder msgSend = new MessageBuilder(msg);
+        msgSend.setTTS(true);
+        event.getChannel().sendMessage(msgSend.build()).queue();
     }
 
     private void help(MessageReceivedEvent event) {
