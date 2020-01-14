@@ -69,7 +69,8 @@ public class Bot extends ListenerAdapter {
                 bocchi(event);
             else if (msg.equalsIgnoreCase("!@"))
                 at(event);
-            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$"))
+            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$")
+                    || msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$"))
                 loadAndPlay(msg.substring(1), event);
         }
     }
