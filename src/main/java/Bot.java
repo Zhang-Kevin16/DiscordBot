@@ -207,7 +207,7 @@ public class Bot extends ListenerAdapter {
 
                 @Override
                 public void noMatches() {
-                    //ignore for now since we have handpicked the songs to play
+                    sendMessage(event, "invalid url");
                 }
 
                 @Override
