@@ -23,6 +23,9 @@ import javax.security.auth.login.LoginException;
 public class Bot extends ListenerAdapter {
     //Audio manager that is used to manage audio players
     AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+    //Used for identifying the YouTube URL.
+    private static final boolean start = true;
+    private static final boolean none = false;
 
     public Bot() {
         playerManager = new DefaultAudioPlayerManager();
@@ -69,9 +72,11 @@ public class Bot extends ListenerAdapter {
                 bocchi(event);
             else if (msg.equalsIgnoreCase("!@"))
                 at(event);
-            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$")
-                    || msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$"))
-                loadAndPlay(msg.substring(1), event);
+            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$"))
+                loadAndPlay(msg.substring(1), event, none);
+            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$")) {
+                loadAndPlay(msg.substring(1), event, start);
+            }
         }
     }
 
@@ -165,7 +170,7 @@ public class Bot extends ListenerAdapter {
     }
 
     private void ayaya(MessageReceivedEvent event) {
-        loadAndPlay("https://www.youtube.com/watch?v=D0q0QeQbw9U", event);
+        loadAndPlay("https://www.youtube.com/watch?v=D0q0QeQbw9U", event, none);
     }
 
     private void stop(MessageReceivedEvent event) {
@@ -184,10 +189,10 @@ public class Bot extends ListenerAdapter {
     }
 
     private void seno(MessageReceivedEvent event){
-        loadAndPlay("https://www.youtube.com/watch?v=oyuHmYSt2iA",  event);
+        loadAndPlay("https://www.youtube.com/watch?v=oyuHmYSt2iA",  event, none);
     }
 
-    private void loadAndPlay(String trackUrl, MessageReceivedEvent event) {
+    private void loadAndPlay(String trackUrl, MessageReceivedEvent event, boolean type) {
             VoiceChannel channel = event.getMember().getVoiceState().getChannel();
             AudioPlayer player = playerManager.createPlayer();
             if (channel == null) {
@@ -198,6 +203,22 @@ public class Bot extends ListenerAdapter {
             playerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(AudioTrack track) {
+                    if (type == start){
+                        String timeS = "";
+                        int indexOfTime = trackUrl.indexOf("?t=");
+                        if (indexOfTime != -1) {
+                            timeS = trackUrl.substring(indexOfTime+3);
+                        } else {
+                            timeS = trackUrl.substring(indexOfTime+6);
+                        }
+                        try {
+                            int startTime = Integer.parseInt(timeS);
+                            track.setPosition(startTime * 1000);
+                            player.playTrack(track);
+                        } catch (NumberFormatException e) {
+                            sendMessage(event, "invalid timestamp");
+                        }
+                    }
                     player.playTrack(track);
                 }
 
