@@ -48,7 +48,7 @@ public class Bot extends ListenerAdapter {
      */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        String msg = event.getMessage().getContentRaw();
+        String msg = event.getMessage().getContentDisplay();
         //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
             if (msg.equalsIgnoreCase("!seal"))
