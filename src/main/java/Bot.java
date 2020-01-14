@@ -17,30 +17,39 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import javax.security.auth.login.LoginException;
-import java.util.ArrayList;
+
+//This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory
 
 public class Bot extends ListenerAdapter {
+    //Audio manager that is used to manage audio players
     AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
 
     public Bot() {
         playerManager = new DefaultAudioPlayerManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
         AudioSourceManagers.registerRemoteSources(playerManager);
-        playerManager.setPlayerCleanupThreshold(10000);
+        playerManager.setPlayerCleanupThreshold(10000); //Set the cleanup threshold to 10000ms or 10 seconds.
         AudioPlayer player = playerManager.createPlayer();
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
-        String token = "NjY1NDA1MTk0MTMzMDQ1MjU5.XhqORw.t2jDYQrpok227hFE1LuV-guqSes";
-        System.out.println(token);
+        String token = "NjY1NDA1MTk0MTMzMDQ1MjU5.XhqORw.t2jDYQrpok227hFE1LuV-guqSes"; //this is the bot token. if the code is made public remove this line and use a input buffer instead or else Discord will shut off the bot.
+        System.out.println(token); //print the token. this meant for testing purposes.
         JDA bot = new JDABuilder(token).build();
         bot.awaitReady();
         bot.addEventListener(new Bot());
     }
 
+    /**
+     * This method is called whenever a message is sent in a text channel in a server/guild that the bot is a part of.
+     * The method will check what the message is and respond accordingly. Ie. if the message was a valid command for the bot
+     * then the bot will respond or else the bot will ignore.
+     * @param event this represents the message and hold information such as the contents, author and channel of the message.
+     */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         String msg = event.getMessage().getContentRaw();
+        //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
             if (msg.equalsIgnoreCase("!seal"))
                 seal(event);
@@ -60,29 +69,43 @@ public class Bot extends ListenerAdapter {
                 bocchi(event);
             else if (msg.equalsIgnoreCase("!@"))
                 at(event);
-
+            else if (msg.matches("(!)^(https?\\:\\/\\/)?(www\\.)?(youtube\\.com|youtu\\.?be)\\/.+$\n"))
+                loadAndPlay(msg, event);
         }
     }
 
+    /**
+     * This method is called whenever a user has left the channel
+     * @param event contains information such as which user left and the channel that the user left from.
+     */
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
-        VoiceChannel channel = event.getChannelLeft();
-        Guild guild = event.getGuild();
-        AudioManager manager = guild.getAudioManager();
-        if (channel.getMembers().size() == 1 && channel.getIdLong() == manager.getConnectedChannel().getIdLong()) {
-            if (manager.isConnected())
-                manager.closeAudioConnection();
-        }
+        checkLeave(event);
     }
 
+    /**
+     * Sends a custom emote sequence from the KillerB's Meme Emporium Server to the text channel from which the command was evoked.
+     * This method will only work on KillerB's Meme Emporium server.
+     * @param event contains information about the command that was sent
+     */
     private void bocchi(MessageReceivedEvent event) {
         sendMessage(event, "<:Bocchi1:638528475069939725><:Bocchi2:638528488726462498>\n<:Bocchi3:638528499187187712><:Bocchi4:638528508888481817>");
     }
 
+    /**
+     * Sends the Navy Seal copypasta to the text channel from which the command was evoked.
+     * Will work on all servers the bot is a part of.
+     * @param event contains information about the command that was sent
+     */
     private void seal(MessageReceivedEvent event) {
         event.getChannel().sendMessage("What the fuck did you just fucking say about me, you little bitch? I'll have you know I graduated top of my class in the Navy Seals, and I've been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and I'm the top sniper in the entire US armed forces. You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life. You're fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and that's just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. If only you could have known what unholy retribution your little \"clever\" comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn't, you didn't, and now you're paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You're fucking dead, kiddo.").queue();
     }
 
+    /**
+     * Sends a text-to-speech message to the server form which the command was evoked.
+     * The message consists of a random number of "@" between 10 and 20.
+     * @param event contains infromation abouut the command that was sent
+     */
     private void at(MessageReceivedEvent event) {
         int times = (int)(Math.random() * 10.0 + 10.0);
         StringBuilder msg = new StringBuilder();
@@ -93,6 +116,10 @@ public class Bot extends ListenerAdapter {
         event.getChannel().sendMessage(msgSend.build()).queue();
     }
 
+    /**
+     * Sends a list of the bots command to the text channel that evoked the command.
+     * @param event contains information about the bot.
+     */
     private void help(MessageReceivedEvent event) {
         event.getChannel().sendMessage("!seal: copypasta \n " +
                 "!gamer: mentions others depending on who you are \n" +
@@ -124,6 +151,16 @@ public class Bot extends ListenerAdapter {
 
     private void sendMessage(MessageReceivedEvent event, String msg) {
         event.getChannel().sendMessage(msg).queue();
+    }
+
+    private void checkLeave(GuildVoiceLeaveEvent event) {
+        VoiceChannel channel = event.getChannelLeft();
+        Guild guild = event.getGuild();
+        AudioManager manager = guild.getAudioManager();
+        if (channel.getMembers().size() == 1 && channel.getIdLong() == manager.getConnectedChannel().getIdLong()) {
+            if (manager.isConnected())
+                manager.closeAudioConnection();
+        }
     }
 
     private void ayaya(MessageReceivedEvent event) {
@@ -165,17 +202,17 @@ public class Bot extends ListenerAdapter {
 
                 @Override
                 public void playlistLoaded(AudioPlaylist playlist) {
-
+                    //ignore for now since we only play one song
                 }
 
                 @Override
                 public void noMatches() {
-
+                    //ignore for now since we have handpicked the songs to play
                 }
 
                 @Override
                 public void loadFailed(FriendlyException exception) {
-
+                    sendMessage(event, "Song load failed");
                 }
             });
             AudioManager manager = guild.getAudioManager();
@@ -183,5 +220,4 @@ public class Bot extends ListenerAdapter {
             if (!manager.isConnected())
                 manager.openAudioConnection(channel);
         }
-
 }
