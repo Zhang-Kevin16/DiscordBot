@@ -3,11 +3,11 @@ import com.google.protobuf.ByteString;
 import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.api.StreamSpeechRecognizer;
-import io.grpc.internal.IoUtils;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.CombinedAudio;
 import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.io.IOUtils;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -305,7 +305,7 @@ public class SpeechReceiver implements AudioReceiveHandler {
             AudioFormat target = new AudioFormat(16000f, 16, 1, true, false);
             AudioInputStream is = AudioSystem.getAudioInputStream(target, new AudioInputStream(new ByteArrayInputStream(pcm), AudioReceiveHandler.OUTPUT_FORMAT, pcm.length));
             AudioSystem.write(is, AudioFileFormat.Type.WAVE, new File(cache + File.separator + "audio.wav"));
-            return IoUtils.toByteArray(new FileInputStream(new File(cache + File.separator + "audio.wav")));
+            return IOUtils.toByteArray(new FileInputStream(new File(cache + File.separator + "audio.wav")));
         } catch(Exception e) {
             System.out.println("Failed to convert!");
         }
