@@ -24,8 +24,8 @@ public class Bot extends ListenerAdapter {
     //Audio manager that is used to manage audio players
     AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
     //Used for identifying the YouTube URL.
-    private static final boolean start = true;
-    private static final boolean none = false;
+    private static final boolean start = true; //there is a timestamp that we want to start from
+    private static final boolean none = false; //there is not a timestamp to start from
 
     public Bot() {
         playerManager = new DefaultAudioPlayerManager();
@@ -72,11 +72,14 @@ public class Bot extends ListenerAdapter {
                 bocchi(event);
             else if (msg.equalsIgnoreCase("!@"))
                 at(event);
+            //checking YouTube links without timestamps
             else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$"))
                 loadAndPlay(msg.substring(1), event, none);
-            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$")) {
+            //checking youtube links with timestamps.
+            else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$"))
                 loadAndPlay(msg.substring(1), event, start);
-            }
+            else if (msg.equalsIgnoreCase("!listen"))
+                listen(event);
         }
     }
 
@@ -159,6 +162,11 @@ public class Bot extends ListenerAdapter {
         event.getChannel().sendMessage(msg).queue();
     }
 
+    /**
+     * Called when someone leaves a voice channel. If the bot is in the same channel as the one that was left then the bot will leave iff the channel is empty
+     * except for the bot
+     * @param event contains information of what channel was left.
+     */
     private void checkLeave(GuildVoiceLeaveEvent event) {
         VoiceChannel channel = event.getChannelLeft();
         Guild guild = event.getGuild();
@@ -173,6 +181,10 @@ public class Bot extends ListenerAdapter {
         loadAndPlay("https://www.youtube.com/watch?v=D0q0QeQbw9U", event, none);
     }
 
+    /**
+     * Tells the bot to leave the voice channel.
+     * @param event contains information as to what where the message was sent from.
+     */
     private void stop(MessageReceivedEvent event) {
         VoiceChannel channel = event.getMember().getVoiceState().getChannel();
         if (channel == null) {
@@ -192,54 +204,82 @@ public class Bot extends ListenerAdapter {
         loadAndPlay("https://www.youtube.com/watch?v=oyuHmYSt2iA",  event, none);
     }
 
+    /**
+     * Loads a audio file from a source. Only works with YouTube right now
+     * @param trackUrl the url of the YouTube video
+     * @param event contains information as to where the request came from
+     * @param type whether or not there is a predetermined timestamp from the url.
+     */
     private void loadAndPlay(String trackUrl, MessageReceivedEvent event, boolean type) {
-            VoiceChannel channel = event.getMember().getVoiceState().getChannel();
-            AudioPlayer player = playerManager.createPlayer();
-            if (channel == null) {
-                sendMessage(event, "You are not currently in a channel");
-                return;
-            }
-            Guild guild = event.getGuild();
-            playerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
-                @Override
-                public void trackLoaded(AudioTrack track) {
-                    if (type == start){
-                        String timeS = "";
-                        int indexOfTime = trackUrl.indexOf("?t=");
-                        if (indexOfTime != -1) {
-                            timeS = trackUrl.substring(indexOfTime+3);
-                        } else {
-                            timeS = trackUrl.substring(indexOfTime+6);
-                        }
-                        try {
-                            int startTime = Integer.parseInt(timeS);
-                            track.setPosition(startTime * 1000);
-                            player.playTrack(track);
-                        } catch (NumberFormatException e) {
-                            sendMessage(event, "invalid timestamp");
-                        }
-                    }
-                    player.playTrack(track);
-                }
-
-                @Override
-                public void playlistLoaded(AudioPlaylist playlist) {
-                    //ignore for now since we only play one song
-                }
-
-                @Override
-                public void noMatches() {
-                    sendMessage(event, "invalid url");
-                }
-
-                @Override
-                public void loadFailed(FriendlyException exception) {
-                    sendMessage(event, "Song load failed");
-                }
-            });
-            AudioManager manager = guild.getAudioManager();
-            manager.setSendingHandler(new AudioPlayerSendHandler(player));
-            if (!manager.isConnected())
-                manager.openAudioConnection(channel);
+        VoiceChannel channel = event.getMember().getVoiceState().getChannel();
+        AudioPlayer player = playerManager.createPlayer();
+        if (channel == null) {
+            sendMessage(event, "You are not currently in a channel");
+            return;
         }
+        Guild guild = event.getGuild();
+        playerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
+            @Override
+            public void trackLoaded(AudioTrack track) {
+                if (type == start) {
+                    String timeS = "";
+                    int indexOfTime = trackUrl.indexOf("?t=");
+                    if (indexOfTime != -1) {
+                        timeS = trackUrl.substring(indexOfTime + 3);
+                    } else {
+                        timeS = trackUrl.substring(indexOfTime + 6);
+                    }
+                    try {
+                        int startTime = Integer.parseInt(timeS);
+                        track.setPosition(startTime * 1000);
+                        player.playTrack(track);
+                    } catch (NumberFormatException e) {
+                        sendMessage(event, "invalid timestamp");
+                    }
+                }
+                player.playTrack(track);
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                //ignore for now since we only play one song
+            }
+
+            @Override
+            public void noMatches() {
+                sendMessage(event, "invalid url");
+            }
+
+            @Override
+            public void loadFailed(FriendlyException exception) {
+                sendMessage(event, "load failed");
+            }
+        });
+        AudioManager manager = guild.getAudioManager();
+        manager.setSendingHandler(new AudioPlayerSendHandler(player));
+        if (!manager.isConnected())
+            manager.openAudioConnection(channel);
+    }
+
+    private void listen (MessageReceivedEvent event) {
+        AudioManager manager = event.getGuild().getAudioManager();
+        manager.setSendingHandler(new SilenceAudioSendHandler());
+
+        SpeechReceiver receiver = new SpeechReceiver("hey bot", new SpeechCallback() {
+            @Override
+            public void commandReceived(String command) {
+                if (command.equalsIgnoreCase("at bailey"))
+                    sendMessage(event, "<@175789260312412160");
+            }
+
+            @Override
+            public boolean botAwakeRequest(User... user) {
+                return true;
+            }
+        });
+
+        receiver.setCombinedAudio(false);
+        manager.setReceivingHandler(receiver);
+        manager.openAudioConnection(event.getMember().getVoiceState().getChannel());
+    }
 }
