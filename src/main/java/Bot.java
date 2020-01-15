@@ -269,17 +269,22 @@ public class Bot extends ListenerAdapter {
             @Override
             public void commandReceived(String command) {
                 if (command.equalsIgnoreCase("at bailey"))
-                    sendMessage(event, "<@175789260312412160");
+                    sendMessage(event, "<@175789260312412160>");
             }
 
             @Override
             public boolean botAwakeRequest(User... user) {
+                sendMessage(event, "I'm listening");
                 return true;
             }
         });
 
         receiver.setCombinedAudio(false);
         manager.setReceivingHandler(receiver);
-        manager.openAudioConnection(event.getMember().getVoiceState().getChannel());
+        try {
+            manager.openAudioConnection(event.getMember().getVoiceState().getChannel());
+        } catch (NullPointerException e) {
+            sendMessage(event, "You're not in a channel");
+        }
     }
 }
