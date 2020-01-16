@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import javax.security.auth.login.LoginException;
 import java.util.Scanner;
 
-//This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory
+//This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory.
 
 public class Bot extends ListenerAdapter {
     //Audio manager that is used to manage audio players
