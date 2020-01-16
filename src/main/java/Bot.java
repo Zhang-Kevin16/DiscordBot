@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import javax.security.auth.login.LoginException;
+import java.util.Scanner;
 
 //This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory
 
@@ -36,7 +37,9 @@ public class Bot extends ListenerAdapter {
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
-        String token = "NjY1NDA1MTk0MTMzMDQ1MjU5.XhqORw.t2jDYQrpok227hFE1LuV-guqSes"; //this is the bot token. if the code is made public remove this line and use a input buffer instead or else Discord will shut off the bot.
+        Scanner tokenScanner = new Scanner(System.in);
+        System.out.println("Enter token");
+        String token = tokenScanner.nextLine();
         System.out.println(token); //print the token. this meant for testing purposes.
         JDA bot = new JDABuilder(token).build();
         bot.awaitReady();
@@ -258,5 +261,5 @@ public class Bot extends ListenerAdapter {
         if (!manager.isConnected())
             manager.openAudioConnection(channel);
     }
-    
+
 }
