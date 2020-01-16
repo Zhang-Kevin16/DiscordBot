@@ -263,8 +263,6 @@ public class Bot extends ListenerAdapter {
 
     private void listen (MessageReceivedEvent event) {
         AudioManager manager = event.getGuild().getAudioManager();
-        manager.setSendingHandler(new SilenceAudioSendHandler());
-
         SpeechReceiver receiver = new SpeechReceiver("hey bot", new SpeechCallback() {
             @Override
             public void commandReceived(String command) {
@@ -279,7 +277,7 @@ public class Bot extends ListenerAdapter {
             }
         });
 
-        receiver.setCombinedAudio(false);
+        receiver.setCombinedAudio(true);
         manager.setReceivingHandler(receiver);
         try {
             manager.openAudioConnection(event.getMember().getVoiceState().getChannel());
