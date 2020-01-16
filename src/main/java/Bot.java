@@ -78,8 +78,6 @@ public class Bot extends ListenerAdapter {
             //checking youtube links with timestamps.
             else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$"))
                 loadAndPlay(msg.substring(1), event, start);
-            else if (msg.equalsIgnoreCase("!listen"))
-                listen(event);
         }
     }
 
@@ -260,29 +258,5 @@ public class Bot extends ListenerAdapter {
         if (!manager.isConnected())
             manager.openAudioConnection(channel);
     }
-
-    private void listen (MessageReceivedEvent event) {
-        AudioManager manager = event.getGuild().getAudioManager();
-        SpeechReceiver receiver = new SpeechReceiver("hey bot", new SpeechCallback() {
-            @Override
-            public void commandReceived(String command) {
-                if (command.equalsIgnoreCase("at bailey"))
-                    sendMessage(event, "<@175789260312412160>");
-            }
-
-            @Override
-            public boolean botAwakeRequest(User... user) {
-                sendMessage(event, "I'm listening");
-                return true;
-            }
-        });
-
-        receiver.setCombinedAudio(true);
-        manager.setReceivingHandler(receiver);
-        try {
-            manager.openAudioConnection(event.getMember().getVoiceState().getChannel());
-        } catch (NullPointerException e) {
-            sendMessage(event, "You're not in a channel");
-        }
-    }
+    
 }
