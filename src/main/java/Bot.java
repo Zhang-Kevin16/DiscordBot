@@ -75,12 +75,14 @@ public class Bot extends ListenerAdapter {
                 bocchi(event);
             else if (msg.equalsIgnoreCase("!@"))
                 at(event);
-            //checking YouTube links without timestamps
+            //checking YouTube links without timestamps.
             else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$"))
                 loadAndPlay(msg.substring(1), event, none);
             //checking youtube links with timestamps.
             else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$"))
                 loadAndPlay(msg.substring(1), event, start);
+            else if (msg.equalsIgnoreCase("/spit"))
+                spit(event);
         }
     }
 
@@ -90,7 +92,11 @@ public class Bot extends ListenerAdapter {
      */
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
-        checkLeave(event);
+        try {
+            checkLeave(event);
+        } catch (NullPointerException ignored) {
+            //ignore since checkLeave only generates a null pointer when the bot isn't connected to a channel when a user leaves.
+        }
     }
 
     /**
@@ -151,7 +157,7 @@ public class Bot extends ListenerAdapter {
                 sendMessage(event, "Gaymer Time <@224300400126328834><@171091041905147915>");
                 return;
             default:
-                sendMessage(event, "This command isn't made for you. Fuck off.");
+                sendMessage(event, "This command isn't made for you. Screw off");
         }
     }
 
@@ -159,6 +165,11 @@ public class Bot extends ListenerAdapter {
         sendMessage(event, ":regional_indicator_n: :regional_indicator_u: :regional_indicator_t:");
     }
 
+    /**
+     * Sends a message to the specified channel
+     * @param event the channel to send the message to. Is always the channel from which to command came from.
+     * @param msg the message to be sent in the Discord API format.
+     */
     private void sendMessage(MessageReceivedEvent event, String msg) {
         event.getChannel().sendMessage(msg).queue();
     }
@@ -171,6 +182,7 @@ public class Bot extends ListenerAdapter {
     private void checkLeave(GuildVoiceLeaveEvent event) {
         VoiceChannel channel = event.getChannelLeft();
         Guild guild = event.getGuild();
+
         AudioManager manager = guild.getAudioManager();
         if (channel.getMembers().size() == 1 && channel.getIdLong() == manager.getConnectedChannel().getIdLong()) {
             if (manager.isConnected())
@@ -183,22 +195,22 @@ public class Bot extends ListenerAdapter {
     }
 
     /**
-     * Tells the bot to leave the voice channel.
+     * Tells the bot to leave the voice channel. Will only work if the user that fires the command is in the same voice channel as the bot.
+     * The bot will indicate to the user if it is not currently in a voice channel.
      * @param event contains information as to what where the message was sent from.
      */
     private void stop(MessageReceivedEvent event) {
-        VoiceChannel channel = event.getMember().getVoiceState().getChannel();
-        if (channel == null) {
-            sendMessage(event, "You are not currently in a channel");
-            return;
+         try {
+             VoiceChannel channel = event.getMember().getVoiceState().getChannel();
+             Guild guild = event.getGuild();
+             AudioManager manager = guild.getAudioManager();
+             if (manager.isConnected())
+                 manager.closeAudioConnection();
+             else
+                 sendMessage(event, "The bot isn't in the voice channel idiot.");
+         } catch (NullPointerException userNotInVoiceChannel) {
+            sendMessage(event, "You are not currently in a channel idiot");
         }
-
-        Guild guild = event.getGuild();
-        AudioManager manager = guild.getAudioManager();
-        if (manager.isConnected())
-            manager.closeAudioConnection();
-        else
-            sendMessage(event, "The bot isn't in the voice channel retard.");
     }
 
     private void seno(MessageReceivedEvent event){
@@ -212,54 +224,61 @@ public class Bot extends ListenerAdapter {
      * @param type whether or not there is a predetermined timestamp from the url.
      */
     private void loadAndPlay(String trackUrl, MessageReceivedEvent event, boolean type) {
-        VoiceChannel channel = event.getMember().getVoiceState().getChannel();
-        AudioPlayer player = playerManager.createPlayer();
-        if (channel == null) {
-            sendMessage(event, "You are not currently in a channel");
-            return;
-        }
-        Guild guild = event.getGuild();
-        playerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                if (type == start) {
-                    String timeS = "";
-                    int indexOfTime = trackUrl.indexOf("?t=");
-                    if (indexOfTime != -1) {
-                        timeS = trackUrl.substring(indexOfTime + 3);
-                    } else {
-                        timeS = trackUrl.substring(indexOfTime + 6);
+        try {
+            VoiceChannel channel = event.getMember().getVoiceState().getChannel();
+            AudioPlayer player = playerManager.createPlayer();
+            if (channel == null) {
+                sendMessage(event, "You are not currently in a channel");
+                return;
+            }
+            Guild guild = event.getGuild();
+            playerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
+                @Override
+                public void trackLoaded(AudioTrack track) {
+                    if (type == start) {
+                        String timeS = "";
+                        int indexOfTime = trackUrl.indexOf("?t=");
+                        if (indexOfTime != -1) {
+                            timeS = trackUrl.substring(indexOfTime + 3);
+                        } else {
+                            timeS = trackUrl.substring(indexOfTime + 6);
+                        }
+                        try {
+                            int startTime = Integer.parseInt(timeS);
+                            track.setPosition(startTime * 1000);
+                            player.playTrack(track);
+                        } catch (NumberFormatException e) {
+                            sendMessage(event, "invalid timestamp");
+                        }
                     }
-                    try {
-                        int startTime = Integer.parseInt(timeS);
-                        track.setPosition(startTime * 1000);
-                        player.playTrack(track);
-                    } catch (NumberFormatException e) {
-                        sendMessage(event, "invalid timestamp");
-                    }
+                    player.playTrack(track);
                 }
-                player.playTrack(track);
-            }
 
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                //ignore for now since we only play one song
-            }
+                @Override
+                public void playlistLoaded(AudioPlaylist playlist) {
+                    //ignore for now since we only play one song
+                }
 
-            @Override
-            public void noMatches() {
-                sendMessage(event, "invalid url");
-            }
+                @Override
+                public void noMatches() {
+                    sendMessage(event, "invalid url");
+                }
 
-            @Override
-            public void loadFailed(FriendlyException exception) {
-                sendMessage(event, "load failed");
-            }
-        });
-        AudioManager manager = guild.getAudioManager();
-        manager.setSendingHandler(new AudioPlayerSendHandler(player));
-        if (!manager.isConnected())
-            manager.openAudioConnection(channel);
+                @Override
+                public void loadFailed(FriendlyException exception) {
+                    sendMessage(event, "load failed");
+                }
+            });
+            AudioManager manager = guild.getAudioManager();
+            manager.setSendingHandler(new AudioPlayerSendHandler(player));
+            if (!manager.isConnected())
+                manager.openAudioConnection(channel);
+        } catch (NullPointerException userNotInVoiceChannel) {
+            sendMessage(event, "You are not currently in a voice channel idiot");
+        }
     }
 
+    private void spit(MessageReceivedEvent event) {
+        loadAndPlay("https://www.youtube.com/watch?v=hNXkLB_ewc8", event, none);
+    }
 }
