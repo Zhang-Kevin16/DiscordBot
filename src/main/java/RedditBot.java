@@ -11,6 +11,7 @@ public class  RedditBot {
     private String tokenId;
     private static String HEADER1 = "Authorization";
     public RedditBot(String clientID) throws IOException {
+        clientID += ":";
         HttpURLConnection connection = (HttpURLConnection) new URL("https://www.reddit.com/api/v1/access_token").openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
@@ -31,7 +32,7 @@ public class  RedditBot {
     }
 
     public String hot() throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL("https://oauth.reddit.com/rAnimemes+anime_irl/hot").openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL("https://oauth.reddit.com/r/Animemes+anime_irl/hot").openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty(HEADER1, tokenId);;
         int place = (int) (Math.random() * 10.0);
