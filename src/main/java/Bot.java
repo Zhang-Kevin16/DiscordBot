@@ -29,17 +29,21 @@ import java.util.Scanner;
 
 public class Bot extends ListenerAdapter {
     //Audio manager that is used to manage audio players
-    AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+    private AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
     //Used for identifying the YouTube URL.
     private static final boolean start = true; //there is a timestamp that we want to start from
     private static final boolean none = false; //there is not a timestamp to start from
+    private final String clientID;
 
-    public Bot() {
+    private Bot() {
         playerManager = new DefaultAudioPlayerManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
         AudioSourceManagers.registerRemoteSources(playerManager);
         playerManager.setPlayerCleanupThreshold(10000); //Set the cleanup threshold to 10000ms or 10 seconds.
         AudioPlayer player = playerManager.createPlayer();
+        Scanner idScanner = new Scanner(System.in);
+        clientID = idScanner.nextLine();
+        idScanner.close();
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
@@ -47,6 +51,7 @@ public class Bot extends ListenerAdapter {
         System.out.println("Enter token");
         String token = tokenScanner.nextLine();
         System.out.println(token); //print the token. this meant for testing purposes.
+        tokenScanner.close();
         JDA bot = new JDABuilder(token).build();
         bot.awaitReady();
         bot.addEventListener(new Bot());
@@ -89,8 +94,8 @@ public class Bot extends ListenerAdapter {
                 loadAndPlay(msg.substring(1), event, start);
             else if (msg.contains("/spit"))
                 spit(event);
-            else if (msg.contains("!post"))
-                post(event);
+            else if (msg.contains("!hot"))
+                hot(event);
         }
     }
 
@@ -290,20 +295,10 @@ public class Bot extends ListenerAdapter {
         loadAndPlay("https://www.youtube.com/watch?v=hNXkLB_ewc8", event, none);
     }
 
-    private void post(MessageReceivedEvent event) {
+    private void hot(MessageReceivedEvent event) {
         try {
-
-            URLConnection reddit = new URL("https://www.reddit.com/r/Animemes+anime_irl/hot.json").openConnection();
-            int place = (int) (Math.random() * 10.0);
-            BufferedReader jsonIn = new BufferedReader(new InputStreamReader(reddit.getInputStream()));
-            StringBuilder content = new StringBuilder("");
-            String line = "";
-            while ((line = jsonIn.readLine()) != null) {
-                content.append(line);
-            }
-            jsonIn.close();
-            String link = JsonParser.parseString(content.toString()).getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray().get(place).getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
-            sendMessage(event, link);
+            RedditBot reddit = new RedditBot(clientID);
+            sendMessage(event, reddit.hot());
         }
         catch(Exception e) {
             System.out.println(e.toString());
