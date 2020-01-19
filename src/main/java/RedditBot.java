@@ -13,13 +13,13 @@ public class  RedditBot {
     public RedditBot(String clientID) throws IOException {
         clientID += ":";
         HttpURLConnection connection = (HttpURLConnection) new URL("https://www.reddit.com/api/v1/access_token").openConnection();
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
         connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(clientID.getBytes()));
         String VALUE2 = "application/x-www-form-urlencoded";
         String HEADER2 = "Content-Type";
+        connection.setRequestMethod("POST");
         connection.setRequestProperty(HEADER2, VALUE2);
         connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
+        connection.setDoOutput(true);
         connection.getOutputStream().write("grant_type=client_credentials".getBytes());
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
@@ -35,7 +35,7 @@ public class  RedditBot {
     public String hot() throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL("https://oauth.reddit.com/r/Animemes+anime_irl/hot").openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty(HEADER1, tokenId);;
+        connection.setRequestProperty(HEADER1, "Bearer {" + tokenId + "}");;
         int place = (int) (Math.random() * 10.0);
         BufferedReader jsonIn = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder content = new StringBuilder("");
