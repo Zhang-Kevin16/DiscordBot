@@ -18,7 +18,7 @@ public class  RedditBot {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestMethod("POST");
         connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
-        byte[] postData = "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=DEVICE_ID".getBytes(StandardCharsets.UTF_8);
+        byte[] postData = "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=DO_NOT_TRACK_THIS_DEVICE".getBytes(StandardCharsets.UTF_8);
         int dataLength = postData.length;
         connection.setRequestProperty("Content-Length", Integer.toString(dataLength));
         connection.setDoOutput(true);
