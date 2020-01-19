@@ -15,7 +15,7 @@ public class  RedditBot {
         HttpURLConnection connection = (HttpURLConnection) new URL("https://api.reddit.com/api/v1/access_token").openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
-        connection.setRequestProperty(HEADER1, Base64.getEncoder().encodeToString(clientID.getBytes()));
+        connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(clientID.getBytes()));
         String VALUE2 = "application/x-www-form-urlencoded";
         String HEADER2 = "Content-Type";
         connection.setRequestProperty(HEADER2, VALUE2);
