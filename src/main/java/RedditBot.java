@@ -29,6 +29,7 @@ public class  RedditBot {
         while ((line = input.readLine()) != null) {
             finalToken.append(line);
         }
+        System.out.println(finalToken);
         connection.disconnect();
         JsonObject token = JsonParser.parseString(finalToken.toString()).getAsJsonObject();
         tokenId = token.get("access_token").getAsString();
