@@ -1,6 +1,4 @@
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+
 import com.google.gson.JsonParser;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -21,12 +19,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import javax.security.auth.login.LoginException;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
@@ -300,6 +294,7 @@ public class Bot extends ListenerAdapter {
         try {
 
             URLConnection reddit = new URL("https://www.reddit.com/r/Animemes+anime_irl/hot.json").openConnection();
+            int place = (int) (Math.random() * 10.0);
             BufferedReader jsonIn = new BufferedReader(new InputStreamReader(reddit.getInputStream()));
             StringBuilder content = new StringBuilder("");
             String line = "";
@@ -307,7 +302,7 @@ public class Bot extends ListenerAdapter {
                 content.append(line);
             }
             jsonIn.close();
-            String link = JsonParser.parseString(content.toString()).getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
+            String link = JsonParser.parseString(content.toString()).getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray().get(place).getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
             sendMessage(event, link);
         }
         catch(Exception ignored) {
