@@ -41,10 +41,7 @@ public class Bot extends ListenerAdapter {
         AudioSourceManagers.registerRemoteSources(playerManager);
         playerManager.setPlayerCleanupThreshold(10000); //Set the cleanup threshold to 10000ms or 10 seconds.
         AudioPlayer player = playerManager.createPlayer();
-        System.out.println("Reddit token");
-        Scanner idScanner = new Scanner(System.in);
         this.clientID = clientID;
-        idScanner.close();
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
