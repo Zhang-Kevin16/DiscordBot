@@ -14,7 +14,7 @@ public class  RedditBot {
     public RedditBot(String clientID) throws IOException {
         String auth = clientID.concat(":");
         HttpURLConnection connection = (HttpURLConnection) new URL("https://www.reddit.com/api/v1/access_token").openConnection();
-        connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(clientID.getBytes()));
+        connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(auth.getBytes()));
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestMethod("POST");
         connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
