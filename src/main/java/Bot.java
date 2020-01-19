@@ -57,23 +57,23 @@ public class Bot extends ListenerAdapter {
         String msg = event.getMessage().getContentDisplay();
         //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
-            if (msg.equalsIgnoreCase("!seal"))
+            if (msg.contains("!seal"))
                 seal(event);
-            else if (msg.equalsIgnoreCase("!help"))
+            else if (msg.contains("!help"))
                 help(event);
-            else if (msg.equalsIgnoreCase("!gamer"))
+            else if (msg.contains("!gamer"))
                 gamer(event);
-            else if (msg.equalsIgnoreCase("!nut"))
+            else if (msg.contains("!nut"))
                 nut(event);
-            else if (msg.equalsIgnoreCase("!ayaya"))
+            else if (msg.contains("!ayaya"))
                 ayaya(event);
-            else if (msg.equalsIgnoreCase("!stop"))
+            else if (msg.contains("!stop"))
                 stop(event);
-            else if (msg.equalsIgnoreCase("!seno"))
+            else if (msg.contains("!seno"))
                 seno(event);
-            else if (msg.equalsIgnoreCase("!bocchi") || msg.equalsIgnoreCase("!tomodachininaritai"))
+            else if (msg.contains("!bocchi") || msg.contains("!tomodachininaritai"))
                 bocchi(event);
-            else if (msg.equalsIgnoreCase("!@"))
+            else if (msg.contains("!@"))
                 at(event);
             //checking YouTube links without timestamps.
             else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))((\\w|-){11})?$"))
@@ -81,7 +81,7 @@ public class Bot extends ListenerAdapter {
             //checking youtube links with timestamps.
             else if (msg.matches("^(!)(?:https?:\\/\\/)?(?:www\\.)?(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|\\&v=)([^#\\&\\?]*)(?:(\\?t|&start)=(\\d+))$"))
                 loadAndPlay(msg.substring(1), event, start);
-            else if (msg.equalsIgnoreCase("/spit"))
+            else if (msg.contains("/spit"))
                 spit(event);
         }
     }
