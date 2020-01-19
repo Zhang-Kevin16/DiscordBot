@@ -40,6 +40,7 @@ public class  RedditBot {
         HttpURLConnection connection = (HttpURLConnection) new URL("https://oauth.reddit.com/r/Animemes+anime_irl/hot").openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty(HEADER1, "bearer " + tokenId);;
+        connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
         int place = (int) (Math.random() * 10.0);
         BufferedReader jsonIn = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder content = new StringBuilder("");
