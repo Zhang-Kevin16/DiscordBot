@@ -35,7 +35,7 @@ public class Bot extends ListenerAdapter {
     private static final boolean none = false; //there is not a timestamp to start from
     private final String clientID;
 
-    private Bot() {
+    private Bot(String clientID) {
         playerManager = new DefaultAudioPlayerManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
         AudioSourceManagers.registerRemoteSources(playerManager);
@@ -43,7 +43,7 @@ public class Bot extends ListenerAdapter {
         AudioPlayer player = playerManager.createPlayer();
         System.out.println("Reddit token");
         Scanner idScanner = new Scanner(System.in);
-        clientID = idScanner.nextLine();
+        this.clientID = clientID;
         idScanner.close();
     }
 
@@ -51,11 +51,11 @@ public class Bot extends ListenerAdapter {
         Scanner tokenScanner = new Scanner(System.in);
         System.out.println("Enter token");
         String token = tokenScanner.nextLine();
-        System.out.println(token); //print the token. this meant for testing purposes.
-        tokenScanner.close();
+        System.out.println("Reddit Token"); //print the token. this meant for testing purposes.
+        String cliendID = tokenScanner.nextLine();
         JDA bot = new JDABuilder(token).build();
         bot.awaitReady();
-        bot.addEventListener(new Bot());
+        bot.addEventListener(new Bot(cliendID));
     }
 
     /**
