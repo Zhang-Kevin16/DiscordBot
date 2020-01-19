@@ -305,8 +305,8 @@ public class Bot extends ListenerAdapter {
             String link = JsonParser.parseString(content.toString()).getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray().get(place).getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
             sendMessage(event, link);
         }
-        catch(Exception ignored) {
-            System.out.println("Connection failed");
+        catch(Exception e) {
+            System.out.println(e.toString());
         }
     }
 }
