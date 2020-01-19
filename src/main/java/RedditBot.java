@@ -8,7 +8,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public class  RedditBot {
+public class RedditBot {
     private String tokenId;
     private static String HEADER1 = "Authorization";
     public RedditBot(String clientID) throws IOException {
@@ -29,7 +29,6 @@ public class  RedditBot {
         while ((line = input.readLine()) != null) {
             finalToken.append(line);
         }
-        System.out.println(finalToken);
         connection.disconnect();
         JsonObject token = JsonParser.parseString(finalToken.toString()).getAsJsonObject();
         tokenId = token.get("access_token").getAsString();
