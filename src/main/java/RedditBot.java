@@ -12,13 +12,13 @@ public class  RedditBot {
     private String tokenId;
     private static String HEADER1 = "Authorization";
     public RedditBot(String clientID) throws IOException {
-        String auth = clientID.concat(":nopassword");
+        String auth = clientID.concat(":");
         HttpURLConnection connection = (HttpURLConnection) new URL("https://www.reddit.com/api/v1/access_token").openConnection();
         connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(clientID.getBytes()));
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestMethod("POST");
         connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
-        byte[] postData = "grant_type=https://oauth.reddit.com/grants/installed_client& device_id=DEVICE_ID".getBytes(StandardCharsets.UTF_8);
+        byte[] postData = "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=DEVICE_ID".getBytes(StandardCharsets.UTF_8);
         int dataLength = postData.length;
         connection.setRequestProperty("Content-Length", Integer.toString(dataLength));
         connection.setDoOutput(true);
