@@ -95,6 +95,8 @@ public class Bot extends ListenerAdapter {
                 loadAndPlay(msg.substring(1), event, start);
             else if (msg.contains("/spit"))
                 spit(event);
+            else if (msg.contains("!post"))
+                post(event);
         }
     }
 
