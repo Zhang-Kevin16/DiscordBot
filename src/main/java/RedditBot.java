@@ -12,7 +12,7 @@ public class  RedditBot {
     private static String HEADER1 = "Authorization";
     public RedditBot(String clientID) throws IOException {
         clientID += ":";
-        HttpURLConnection connection = (HttpURLConnection) new URL("https://api.reddit.com/api/v1/access_token").openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL("https://www.reddit.com/api/v1/access_token").openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(clientID.getBytes()));
