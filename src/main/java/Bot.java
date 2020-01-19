@@ -299,7 +299,7 @@ public class Bot extends ListenerAdapter {
             sendMessage(event, reddit.hot());
         }
         catch(Exception e) {
-            System.out.println(e.toString());
+            e.printStackTrace();
         }
     }
 }
