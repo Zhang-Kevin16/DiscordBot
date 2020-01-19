@@ -11,16 +11,15 @@ public class  RedditBot {
     private String tokenId;
     private static String HEADER1 = "Authorization";
     public RedditBot(String clientID) throws IOException {
-        clientID += ":";
+        String auth = clientID.concat(":nopassword");
         HttpURLConnection connection = (HttpURLConnection) new URL("https://www.reddit.com/api/v1/access_token").openConnection();
         connection.setRequestProperty(HEADER1, "Basic " + Base64.getEncoder().encodeToString(clientID.getBytes()));
-        String VALUE2 = "application/x-www-form-urlencoded";
-        String HEADER2 = "Content-Type";
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestMethod("POST");
-        connection.setRequestProperty(HEADER2, VALUE2);
+        connection.setRequestProperty("grant_type", "https://oauth.reddit.com/grants/installed_client");
+        connection.setRequestProperty("device_id", "DO_NOT_TRACK_THIS_DEVICE");
         connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
         connection.setDoOutput(true);
-        connection.getOutputStream().write("grant_type=client_credentials".getBytes());
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
         StringBuilder finalToken = new StringBuilder("");
