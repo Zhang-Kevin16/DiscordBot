@@ -19,6 +19,7 @@ public class  RedditBot {
         String VALUE2 = "application/x-www-form-urlencoded";
         String HEADER2 = "Content-Type";
         connection.setRequestProperty(HEADER2, VALUE2);
+        connection.setRequestProperty("User-Agent", "DegenerateBot/0.1 by Fak");
         connection.getOutputStream().write("grant_type=client_credentials".getBytes());
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
