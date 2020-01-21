@@ -89,6 +89,8 @@ public class Bot extends ListenerAdapter {
                 spit(event);
             else if (msg.contains("!hot"))
                 hot(event);
+            else if (msg.contains("!jebaited"))
+                jebaited(event);
         }
     }
 
