@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 import javax.security.auth.login.LoginException;
+import java.io.File;
 import java.util.Scanner;
 
 //This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory.
@@ -284,7 +285,7 @@ public class Bot extends ListenerAdapter {
     }
 
     private void spit(MessageReceivedEvent event) {
-        loadAndPlay("https://www.youtube.com/watch?v=hNXkLB_ewc8", event, none);
+        loadAndPlay("https://youtu.be/hNXkLB_ewc8?t=5", event, none);
     }
 
     private void hot(MessageReceivedEvent event) {
@@ -295,5 +296,10 @@ public class Bot extends ListenerAdapter {
         catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void jebaited(MessageReceivedEvent event){
+        File jebaited = new File("jebaited.png");
+        event.getChannel().sendFile(jebaited).queue();
     }
 }
