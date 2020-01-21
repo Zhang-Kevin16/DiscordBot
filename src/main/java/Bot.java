@@ -93,6 +93,8 @@ public class Bot extends ListenerAdapter {
                 fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
+            else if (msg.contains("!fat"))
+                sendMessage(event, "https://cdn.discordapp.com/attachments/223279816739258369/669060461756416010/IMG_20181212_022215.jpg");
         }
     }
 
@@ -309,4 +311,5 @@ public class Bot extends ListenerAdapter {
     private void jebaited(MessageReceivedEvent event){
         event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/jebaited.png")).queue();
     }
+
 }
