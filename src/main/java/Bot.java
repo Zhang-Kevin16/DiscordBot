@@ -89,6 +89,8 @@ public class Bot extends ListenerAdapter {
                 spit(event);
             else if (msg.contains("!hot"))
                 hot(event);
+            else if (msg.contains("!4head"))
+                fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
         }
@@ -298,6 +300,10 @@ public class Bot extends ListenerAdapter {
         catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void fourHead(MessageReceivedEvent event){
+        event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/4head.png")).queue();
     }
 
     private void jebaited(MessageReceivedEvent event){
