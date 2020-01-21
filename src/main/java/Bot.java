@@ -285,7 +285,7 @@ public class Bot extends ListenerAdapter {
     }
 
     private void spit(MessageReceivedEvent event) {
-        loadAndPlay("https://youtu.be/hNXkLB_ewc8?t=5", event, none);
+        loadAndPlay("https://youtu.be/hNXkLB_ewc8?t=5", event, start);
     }
 
     private void hot(MessageReceivedEvent event) {
