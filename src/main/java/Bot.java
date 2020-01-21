@@ -301,7 +301,6 @@ public class Bot extends ListenerAdapter {
     }
 
     private void jebaited(MessageReceivedEvent event){
-        File jebaited = new File("jebaited.png");
-        event.getChannel().sendFile(jebaited).queue();
+        event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/jebaited.png")).queue();
     }
 }
