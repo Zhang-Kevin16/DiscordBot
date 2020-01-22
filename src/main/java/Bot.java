@@ -388,9 +388,9 @@ public class Bot extends ListenerAdapter {
         }
     }
 
-    private String[] checkAddRemove(MessageReceivedEvent event, String restOfString) {
+    private String[] checkAddRemove(MessageReceivedEvent event, String restOfString, boolean add) {
         String[] emoteInfo = restOfString.split(" ");
-        if (emoteInfo.length != 2) {
+        if ((emoteInfo.length != 2 && add) || (emoteInfo.length != 1 && !add)) {
             sendMessage(event, "Command is in wrong format");
             return null;
         }
