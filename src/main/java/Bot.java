@@ -1,4 +1,8 @@
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -18,6 +22,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 import javax.security.auth.login.LoginException;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 //This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory.
@@ -29,6 +36,7 @@ public class Bot extends ListenerAdapter {
     private static final boolean start = true; //there is a timestamp that we want to start from
     private static final boolean none = false; //there is not a timestamp to start from
     private final String clientID;
+    private JsonObject emotes;
 
     private Bot(String clientID) {
         playerManager = new DefaultAudioPlayerManager();
@@ -37,6 +45,15 @@ public class Bot extends ListenerAdapter {
         playerManager.setPlayerCleanupThreshold(10000); //Set the cleanup threshold to 10000ms or 10 seconds.
         AudioPlayer player = playerManager.createPlayer();
         this.clientID = clientID;
+        initializeEmotes();
+    }
+
+    private void initializeEmotes() {
+        try(FileReader emoteFile = new FileReader("/home/pi/Bot/DiscordBot/src/main/java/emotes.json")) {
+            emotes = JsonParser.parseReader(emoteFile).getAsJsonObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static  void main(String[] args) throws LoginException, InterruptedException {
@@ -95,6 +112,19 @@ public class Bot extends ListenerAdapter {
                 jebaited(event);
             else if (msg.contains("!fat"))
                 fat(event);
+            else if (msg.substring(0,5).equals("!add")) {
+                String restOfString = msg.substring(7); //Look for all the words past !add.
+                String[] emoteInfo = checkAddRemove(event, restOfString);
+                if (emoteInfo != null)
+                    addEmote(event, emoteInfo[0], emoteInfo[1]);
+            }
+            else if (msg.substring(0,7).equals("!remove")) {
+                String[] emoteInfo = checkAddRemove(event, msg.substring(9));
+                if (emoteInfo != null)
+                    removeEmote(event, emoteInfo[0]);
+            }
+            else if (msg.charAt(0) == '!')
+                sendEmote(event, msg.substring(1));
         }
     }
 
@@ -149,10 +179,7 @@ public class Bot extends ListenerAdapter {
      * @param event contains information about the bot.
      */
     private void help(MessageReceivedEvent event) {
-        event.getChannel().sendMessage("!seal: copypasta \n " +
-                "!gamer: mentions others depending on who you are \n" +
-                "more to be added.")
-                .queue();
+        event.getChannel().sendMessage("!gamer, !seal, !bocchi, !nut, !stop, !ayaya, !seno, /spit, !hot, !4head, !jebaited, !fat, !add emoteName emoteID").queue();
     }
 
     private void gamer(MessageReceivedEvent event) {
@@ -314,5 +341,51 @@ public class Bot extends ListenerAdapter {
 
     private void fat(MessageReceivedEvent event) {
         event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/fat.jpg")).queue();
+    }
+
+    private void sendEmote (MessageReceivedEvent event, String emote) {
+        if (emotes.has(emote))
+            sendMessage(event, emotes.get(emote).getAsString());
+        else
+            sendMessage(event, "This emote doesn't exist");
+    }
+
+    private void addEmote (MessageReceivedEvent event, String emoteName, String emoteID) {
+        if (emotes.has(emoteName))
+            sendMessage(event, "This emote is already associated with another emote. Remove first then add again");
+        else {
+            emotes.addProperty(emoteName, emoteID);
+            overwriteJSON(event);
+        }
+    }
+
+    private void removeEmote(MessageReceivedEvent event, String emoteName) {
+        if (!emotes.has(emoteName))
+            sendMessage(event, "This is not recognized as an added emote");
+        else {
+            emotes.remove(emoteName);
+            overwriteJSON(event);
+        }
+    }
+
+    private void overwriteJSON(MessageReceivedEvent event) {
+        Gson pretty = new GsonBuilder().setPrettyPrinting().create();
+        try{
+            FileWriter newJSONFile = new FileWriter("emotes.json");
+            String prettyPrinted = pretty.toJson(emotes);
+            newJSONFile.write(prettyPrinted);
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendMessage(event, "Couldn't add/remove emote to server. Emote will work but be lost on Bot restarts if this was an add command");
+        }
+    }
+
+    private String[] checkAddRemove(MessageReceivedEvent event, String restOfString) {
+        String[] emoteInfo = restOfString.split(" ");
+        if (emoteInfo.length != 2) {
+            sendMessage(event, "Command is in wrong format");
+            return null;
+        }
+        return emoteInfo;
     }
 }
