@@ -118,7 +118,7 @@ public class Bot extends ListenerAdapter {
                     return;
                 }
                 String restOfString = msg.substring(7); //Look for all the words past !add.
-                String[] emoteInfo = checkAddRemove(event, restOfString);
+                String[] emoteInfo = checkAddRemove(event, restOfString, true);
                 if (emoteInfo != null)
                     addEmote(event, emoteInfo[0], emoteInfo[1]);
             }
@@ -127,7 +127,7 @@ public class Bot extends ListenerAdapter {
                     sendMessage(event, "Invalid format");
                     return;
                 }
-                String[] emoteInfo = checkAddRemove(event, msg.substring(9));
+                String[] emoteInfo = checkAddRemove(event, msg.substring(9), false);
                 if (emoteInfo != null)
                     removeEmote(event, emoteInfo[0]);
             }
