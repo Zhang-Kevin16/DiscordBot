@@ -113,7 +113,7 @@ public class Bot extends ListenerAdapter {
             else if (msg.contains("!fat"))
                 fat(event);
             else if (msg.contains("!add")) {
-                if (!msg.substring(0,5).equals("!add")) {
+                if (!msg.substring(0,4).equals("!add")) {
                     sendMessage(event, "Invalid format");
                     return;
                 }
