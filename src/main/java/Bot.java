@@ -112,13 +112,21 @@ public class Bot extends ListenerAdapter {
                 jebaited(event);
             else if (msg.contains("!fat"))
                 fat(event);
-            else if (msg.substring(0,5).equals("!add")) {
+            else if (msg.contains("!add")) {
+                if (!msg.substring(0,5).equals("!add")) {
+                    sendMessage(event, "Invalid format");
+                    return;
+                }
                 String restOfString = msg.substring(7); //Look for all the words past !add.
                 String[] emoteInfo = checkAddRemove(event, restOfString);
                 if (emoteInfo != null)
                     addEmote(event, emoteInfo[0], emoteInfo[1]);
             }
-            else if (msg.substring(0,7).equals("!remove")) {
+            else if (msg.contains("!remove")) {
+                if (!msg.substring(0,7).equals("!remove")) {
+                    sendMessage(event, "Invalid format");
+                    return;
+                }
                 String[] emoteInfo = checkAddRemove(event, msg.substring(9));
                 if (emoteInfo != null)
                     removeEmote(event, emoteInfo[0]);
