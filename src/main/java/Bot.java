@@ -376,7 +376,7 @@ public class Bot extends ListenerAdapter {
             emotes.remove(emoteName);
             overwriteJSON(event);
             Gson pretty = new GsonBuilder().setPrettyPrinting().create();
-            System.out.println(pretty.toJson(emotes);
+            System.out.println(pretty.toJson(emotes));
         }
     }
 
