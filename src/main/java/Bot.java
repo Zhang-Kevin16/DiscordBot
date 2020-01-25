@@ -365,6 +365,8 @@ public class Bot extends ListenerAdapter {
             sendMessage(event, "This emote is already associated with another emote. Remove first then add again");
         else {
             emotes.addProperty(emoteName, emoteID);
+            Gson pretty = new GsonBuilder().setPrettyPrinting().create();
+            System.out.println(pretty.toJson(emotes));
             overwriteJSON(event);
         }
     }
