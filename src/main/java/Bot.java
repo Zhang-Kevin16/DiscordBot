@@ -385,7 +385,8 @@ public class Bot extends ListenerAdapter {
     private void overwriteJSON(MessageReceivedEvent event) {
         Gson pretty = new GsonBuilder().setPrettyPrinting().create();
         try{
-            FileWriter newJSONFile = new FileWriter("emotes.json");
+            File json = new File("/home/pi/Bot/DiscordBot/src/main/java/emotes.json");
+            FileWriter newJSONFile = new FileWriter(json, false);
             String prettyPrinted = pretty.toJson(emotes);
             newJSONFile.write(prettyPrinted);
         } catch (IOException e) {
