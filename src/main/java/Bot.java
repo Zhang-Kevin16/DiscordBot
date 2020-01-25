@@ -112,7 +112,7 @@ public class Bot extends ListenerAdapter {
                 jebaited(event);
             else if (msg.contains("!fat"))
                 fat(event);
-            else if (msg.contains("!add")) {
+            /*else if (msg.contains("!add")) {
                 if (!msg.substring(0,4).equals("!add")) {
                     sendMessage(event, "Invalid format");
                     return;
@@ -130,7 +130,7 @@ public class Bot extends ListenerAdapter {
                 String[] emoteInfo = checkAddRemove(event, msg.substring(8), false);
                 if (emoteInfo != null)
                     removeEmote(event, emoteInfo[0]);
-            }
+            }*/
             else if (msg.equals("!print"))
                 sendMessage(event, emotes.toString());
             else if (msg.charAt(0) == '!')
