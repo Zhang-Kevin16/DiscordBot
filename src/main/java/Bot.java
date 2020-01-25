@@ -131,6 +131,8 @@ public class Bot extends ListenerAdapter {
                 if (emoteInfo != null)
                     removeEmote(event, emoteInfo[0]);
             }
+            else if (msg.equals("!print"))
+                sendMessage(event, emotes.toString());
             else if (msg.charAt(0) == '!')
                 sendEmote(event, msg.substring(1));
         }
@@ -373,6 +375,8 @@ public class Bot extends ListenerAdapter {
         else {
             emotes.remove(emoteName);
             overwriteJSON(event);
+            Gson pretty = new GsonBuilder().setPrettyPrinting().create();
+            System.out.println(pretty.toJson(emotes);
         }
     }
 
