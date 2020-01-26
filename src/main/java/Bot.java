@@ -134,11 +134,13 @@ public class Bot extends ListenerAdapter {
             else if (msg.equals("!init"))
                 //Temporary solution until I can figure out how to send the emote id over discord without it being transformed automatically
                 initializeEmotes();
-            try {
-                if (msg.charAt(0) == '!')
-                    sendEmote(event, msg.substring(1));
-            } catch (Exception ignored) {
-                
+            else {
+                try {
+                    if (msg.charAt(0) == '!')
+                        sendEmote(event, msg.substring(1));
+                } catch (Exception ignored) {
+
+                }
             }
         }
     }
