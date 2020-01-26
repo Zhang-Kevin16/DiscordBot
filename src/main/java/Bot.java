@@ -131,8 +131,9 @@ public class Bot extends ListenerAdapter {
                 if (emoteInfo != null)
                     removeEmote(event, emoteInfo[0]);
             }*/
-            else if (msg.equals("!print"))
-                sendMessage(event, emotes.toString());
+            else if (msg.equals("!init"))
+                //Temporary solution until I can figure out how to send the emote id over discord without it being transformed automatically
+                initializeEmotes();
             else if (msg.charAt(0) == '!')
                 sendEmote(event, msg.substring(1));
         }
@@ -354,7 +355,6 @@ public class Bot extends ListenerAdapter {
     }
 
     private void sendEmote (MessageReceivedEvent event, String emote) {
-        initializeEmotes(); //Temporary solution until I can figure out how to send the emote id over discord without it being transformed automatically
         if (emotes.has(emote))
             sendMessage(event, emotes.get(emote).getAsString());
         else
