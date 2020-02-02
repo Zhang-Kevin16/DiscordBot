@@ -82,7 +82,7 @@ public class Bot extends ListenerAdapter {
             List<User> mentions = event.getMessage().getMentionedUsers();
             boolean jarred = false;
             for (User u : mentions) {
-                if (u.getAsTag().equals("Thedomesticfish+#9450"))
+                if (u.getAsTag().equals("Thedomesticfish#9450"))
                     jarred = true;
             }
             if (msg.contains("!seal"))
