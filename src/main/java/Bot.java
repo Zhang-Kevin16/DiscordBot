@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 //This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory.
@@ -78,6 +79,12 @@ public class Bot extends ListenerAdapter {
         String msg = event.getMessage().getContentRaw();
         //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
+            List<User> mentions = event.getMessage().getMentionedUsers();
+            boolean jarred = false;
+            for (User u : mentions) {
+                if (u.getAsTag().equals("Thedomesticfish+#9450"))
+                    jarred = true;
+            }
             if (msg.contains("!seal"))
                 seal(event);
             else if (msg.contains("!help"))
@@ -110,7 +117,7 @@ public class Bot extends ListenerAdapter {
                 fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
-            else if (msg.contains("<@224300400126328834>"))
+            else if (jarred)
                 fat(event);
             /*else if (msg.contains("!add")) {
                 if (!msg.substring(0,4).equals("!add")) {
