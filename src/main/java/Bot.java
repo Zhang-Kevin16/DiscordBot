@@ -82,7 +82,7 @@ public class Bot extends ListenerAdapter {
                 seal(event);
             else if (msg.contains("!help"))
                 help(event);
-            else if (msg.contains("!gamer"))
+            else if (msg.contains("!gamer") || msg.contains("!gaymer"))
                 gamer(event);
             else if (msg.contains("!nut"))
                 nut(event);
@@ -357,7 +357,7 @@ public class Bot extends ListenerAdapter {
     }
 
     private void fat(MessageReceivedEvent event) {
-        event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/fat.jpg")).queue();
+        event.getChannel().sendMessage("<@224300400126328834>").addFile(new File("/home/pi/Bot/DiscordBot/src/main/java/fat.jpg")).queue();
     }
 
     private void sendEmote (MessageReceivedEvent event, String emote) {
