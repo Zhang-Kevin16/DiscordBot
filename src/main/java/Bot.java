@@ -75,7 +75,7 @@ public class Bot extends ListenerAdapter {
      */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        String msg = event.getMessage().getContentDisplay();
+        String msg = event.getMessage().getContentRaw();
         //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
             if (msg.contains("!seal"))
@@ -110,7 +110,7 @@ public class Bot extends ListenerAdapter {
                 fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
-            else if (msg.contains("@Thedomesticfish"))
+            else if (msg.contains("<@224300400126328834>"))
                 fat(event);
             /*else if (msg.contains("!add")) {
                 if (!msg.substring(0,4).equals("!add")) {
