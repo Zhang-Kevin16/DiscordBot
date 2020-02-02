@@ -357,7 +357,7 @@ public class Bot extends ListenerAdapter {
     }
 
     private void fat(MessageReceivedEvent event) {
-        event.getChannel().sendMessage("<@224300400126328834>").addFile(new File("/home/pi/Bot/DiscordBot/src/main/java/fat.jpg")).queue();
+        event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/fat.jpg")).queue();
     }
 
     private void sendEmote (MessageReceivedEvent event, String emote) {
