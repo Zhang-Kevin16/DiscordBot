@@ -128,6 +128,8 @@ public class Bot extends ListenerAdapter {
                     tokenizer.nextToken();
                     String name = tokenizer.nextToken();
                     String id = tokenizer.nextToken();
+                    System.out.println(name);
+                    System.out.println(id);
                     addEmote(event, name, id);
                 }
             }
