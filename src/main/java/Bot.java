@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 //This is DiscordBot. The bot is run on a Raspberry Pi so performance is crucial; mainly the bot cannot use too much memory.
 
@@ -76,15 +77,10 @@ public class Bot extends ListenerAdapter {
      */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        String msg = event.getMessage().getContentRaw();
+        String msg = event.getMessage().getContentDisplay();
         //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
-            List<User> mentions = event.getMessage().getMentionedUsers();
-            boolean jarred = false;
-            for (User u : mentions) {
-                if (u.getAsTag().equals("Thedomesticfish#9450"))
-                    jarred = true;
-            }
+
             if (msg.contains("!seal"))
                 seal(event);
             else if (msg.contains("!help"))
@@ -117,30 +113,25 @@ public class Bot extends ListenerAdapter {
                 fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
-            else if (jarred)
+            else if (msg.contains("@Thedomesticfish"))
                 fat(event);
-            /*else if (msg.contains("!add")) {
-                if (!msg.substring(0,4).equals("!add")) {
-                    sendMessage(event, "Invalid format");
-                    return;
-                }
-                String restOfString = msg.substring(5); //Look for all the words past !add.
-                String[] emoteInfo = checkAddRemove(event, restOfString, true);
-                if (emoteInfo != null)
-                    addEmote(event, emoteInfo[0], emoteInfo[1]);
-            }
-            else if (msg.contains("!remove")) {
-                if (!msg.substring(0,7).equals("!remove")) {
-                    sendMessage(event, "Invalid format");
-                    return;
-                }
-                String[] emoteInfo = checkAddRemove(event, msg.substring(8), false);
-                if (emoteInfo != null)
-                    removeEmote(event, emoteInfo[0]);
-            }*/
+
             else if (msg.equals("!init"))
                 //Temporary solution until I can figure out how to send the emote id over discord without it being transformed automatically
                 initializeEmotes();
+
+            else if (msg.contains("!add")){
+                StringTokenizer tokenizer = new StringTokenizer(msg, " ");
+                if (tokenizer.countTokens() != 3) {
+                    sendMessage(event, "Command in wrong format. Expected format !add name emoteID");
+                } else {
+                    tokenizer.nextToken();
+                    String name = tokenizer.nextToken();
+                    String id = tokenizer.nextToken();
+                    addEmote(event, name, id);
+                }
+            }
+
             else {
                 try {
                     if (msg.charAt(0) == '!')
@@ -375,6 +366,12 @@ public class Bot extends ListenerAdapter {
             sendMessage(event, "This emote doesn't exist");
     }
 
+    /**
+     * Add to the
+     * @param event
+     * @param emoteName name users will use to refer to the emote ie. "!LUL"
+     * @param emoteID according to the discord format ie. "<name:idNumber>
+     */
     private void addEmote (MessageReceivedEvent event, String emoteName, String emoteID) {
         if (emotes.has(emoteName))
             sendMessage(event, "This emote is already associated with another emote. Remove first then add again");
@@ -397,13 +394,17 @@ public class Bot extends ListenerAdapter {
         }
     }
 
+    /**
+     * Takes the current emotes JSON object and writes it to the JSON file on the host computer.
+     * @param event
+     */
     private void overwriteJSON(MessageReceivedEvent event) {
         Gson pretty = new GsonBuilder().setPrettyPrinting().create();
         try{
             File json = new File("/home/pi/Bot/DiscordBot/src/main/java/emotes.json");
-            FileWriter newJSONFile = new FileWriter(json, false);
+            FileWriter newJSONFile = new FileWriter(json, true);
             String prettyPrinted = pretty.toJson(emotes);
-            newJSONFile.write(prettyPrinted);
+            newJSONFile.write(",\n" + prettyPrinted);
         } catch (IOException e) {
             e.printStackTrace();
             sendMessage(event, "Couldn't add/remove emote to server. Emote will work but be lost on Bot restarts if this was an add command");
