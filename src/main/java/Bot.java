@@ -48,11 +48,11 @@ public class Bot extends ListenerAdapter {
     private static final String MAIN_PC_FAT_PATH = "D:\\Bot\\src\\main\\java\\fat.jpg";
     private static final String PI_EMOTES_PATH = "/home/pi/Bot/DiscordBot/src/main/java/emotes.json";
     private static final String PI_FAT_PATH = "/home/pi/Bot/DiscordBot/src/main/java/fat.jpg";
-    private static final boolean mainPC = true;
+
     private String fatPath;
     private String emotesPath;
 
-    private Bot(String clientID) {
+    private Bot(String clientID, boolean mainPC) {
         playerManager = new DefaultAudioPlayerManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
         AudioSourceManagers.registerRemoteSources(playerManager);
@@ -91,9 +91,13 @@ public class Bot extends ListenerAdapter {
         String token = tokenScanner.nextLine();
         System.out.println("Reddit Token"); //print the token. this meant for testing purposes.
         String cliendID = tokenScanner.nextLine();
+        String pc = tokenScanner.nextLine();
+        boolean mainPC;
+        mainPC = pc.equals("y");
         JDA bot = new JDABuilder(token).build();
         bot.awaitReady();
-        bot.addEventListener(new Bot(cliendID));
+
+        bot.addEventListener(new Bot(cliendID, mainPC));
     }
 
     /**
