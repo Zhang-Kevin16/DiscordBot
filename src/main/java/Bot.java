@@ -91,6 +91,7 @@ public class Bot extends ListenerAdapter {
         String token = tokenScanner.nextLine();
         System.out.println("Reddit Token"); //print the token. this meant for testing purposes.
         String cliendID = tokenScanner.nextLine();
+        System.out.println("Main PC? (y/n)");
         String pc = tokenScanner.nextLine();
         boolean mainPC;
         mainPC = pc.equals("y");
