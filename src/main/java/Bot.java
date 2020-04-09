@@ -20,11 +20,16 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.internal.requests.Route;
+
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -39,6 +44,13 @@ public class Bot extends ListenerAdapter {
     private static final boolean none = false; //there is not a timestamp to start from
     private final String clientID;
     private JsonObject emotes;
+    private static final String MAIN_PC_EMOTES_PATH = "D:\\Bot\\src\\main\\java\\emotes.json";
+    private static final String MAIN_PC_FAT_PATH = "D:\\Bot\\src\\main\\java\\fat.jpg";
+    private static final String PI_EMOTES_PATH = "/home/pi/Bot/DiscordBot/src/main/java/emotes.json";
+    private static final String PI_FAT_PATH = "/home/pi/Bot/DiscordBot/src/main/java/fat.jpg";
+    private static final boolean mainPC = true;
+    private String fatPath;
+    private String emotesPath;
 
     private Bot(String clientID) {
         playerManager = new DefaultAudioPlayerManager();
@@ -47,13 +59,28 @@ public class Bot extends ListenerAdapter {
         playerManager.setPlayerCleanupThreshold(10000); //Set the cleanup threshold to 10000ms or 10 seconds.
         AudioPlayer player = playerManager.createPlayer();
         this.clientID = clientID;
+        if (mainPC){
+            fatPath = MAIN_PC_FAT_PATH;
+            emotesPath = MAIN_PC_EMOTES_PATH;
+        } else {
+            fatPath = PI_FAT_PATH;
+            emotesPath = PI_EMOTES_PATH;
+        }
         initializeEmotes();
+        System.out.println(fatPath);
+        System.out.println(emotesPath);
     }
 
     private void initializeEmotes() {
-        try(FileReader emoteFile = new FileReader("/home/pi/Bot/DiscordBot/src/main/java/emotes.json")) {
+        try(FileReader emoteFile = new FileReader(emotesPath)) {
             emotes = JsonParser.parseReader(emoteFile).getAsJsonObject();
         } catch (Exception e) {
+            try (FileReader emoteFile = new FileReader(emotesPath)) {
+                resetEmotes();
+                emotes = JsonParser.parseReader(emoteFile).getAsJsonObject();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -77,7 +104,7 @@ public class Bot extends ListenerAdapter {
      */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        String msg = event.getMessage().getContentDisplay();
+        String msg = event.getMessage().getContentRaw();
         //checking if there is a command and what it is.
         if (!event.getAuthor().isBot()) {
 
@@ -113,12 +140,15 @@ public class Bot extends ListenerAdapter {
                 fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
-            else if (msg.contains("@Thedomesticfish"))
+            else if (msg.contains("@!224300400126328834"))
                 fat(event);
 
-            else if (msg.equals("!init"))
-                //Temporary solution until I can figure out how to send the emote id over discord without it being transformed automatically
-                initializeEmotes();
+            else if (msg.equals("!init") && event.getAuthor().getId().equals("171091041905147915"))
+                addAllEmotes(event);
+
+            else if (msg.equals("!reset") && event.getAuthor().getId().equals("171091041905147915"))
+                resetEmotes();
+
 
             else if (msg.contains("!add")){
                 StringTokenizer tokenizer = new StringTokenizer(msg, " ");
@@ -130,8 +160,16 @@ public class Bot extends ListenerAdapter {
                     String id = tokenizer.nextToken();
                     System.out.println(name);
                     System.out.println(id);
-                    addEmote(event, name, id);
+                    addEmote(event, name, id.substring(1));
                 }
+            }
+
+            else if (msg.contains("!remove")) {
+                StringTokenizer tokenizer = new StringTokenizer(msg, " ");
+                if (tokenizer.countTokens() != 2)
+                    sendMessage(event, "Wrong format. Expected: !remove emoteName");
+                tokenizer.nextToken();
+                removeEmote(event, tokenizer.nextToken());
             }
 
             else {
@@ -358,14 +396,12 @@ public class Bot extends ListenerAdapter {
     }
 
     private void fat(MessageReceivedEvent event) {
-        event.getChannel().sendFile(new File("/home/pi/Bot/DiscordBot/src/main/java/fat.jpg")).queue();
+        event.getChannel().sendFile(new File(fatPath)).queue();
     }
 
     private void sendEmote (MessageReceivedEvent event, String emote) {
         if (emotes.has(emote))
             sendMessage(event, emotes.get(emote).getAsString());
-        else
-            sendMessage(event, "This emote doesn't exist");
     }
 
     /**
@@ -379,10 +415,19 @@ public class Bot extends ListenerAdapter {
             sendMessage(event, "This emote is already associated with another emote. Remove first then add again");
         else {
             emotes.addProperty(emoteName, emoteID);
-            Gson pretty = new GsonBuilder().setPrettyPrinting().create();
-            System.out.println(pretty.toJson(emotes));
             overwriteJSON(event);
         }
+    }
+
+
+    private void addAllEmotes(MessageReceivedEvent event) {
+        Guild server = event.getGuild();
+        List<Emote> emotesList = server.getEmotes();
+        for (Emote e : emotesList) {
+            if (!emotes.has(e.getName()))
+                emotes.addProperty(e.getName(),e.getAsMention());
+        }
+        overwriteJSON(event);
     }
 
     private void removeEmote(MessageReceivedEvent event, String emoteName) {
@@ -391,27 +436,23 @@ public class Bot extends ListenerAdapter {
         else {
             emotes.remove(emoteName);
             overwriteJSON(event);
-            Gson pretty = new GsonBuilder().setPrettyPrinting().create();
-            System.out.println(pretty.toJson(emotes));
         }
     }
 
-    /**
-     * Takes the current emotes JSON object and writes it to the JSON file on the host computer.
-     * @param event
-     */
     private void overwriteJSON(MessageReceivedEvent event) {
         Gson pretty = new GsonBuilder().setPrettyPrinting().create();
-        try{
-            File json = new File("/home/pi/Bot/DiscordBot/src/main/java/emotes.json");
-            FileWriter newJSONFile = new FileWriter(json, true);
+        try {
+            FileWriter newJSONFile = new FileWriter(emotesPath);
             String prettyPrinted = pretty.toJson(emotes);
-            newJSONFile.write(",\n" + prettyPrinted);
+            System.out.println(prettyPrinted);
+            newJSONFile.write(prettyPrinted);
+            newJSONFile.close();
         } catch (IOException e) {
             e.printStackTrace();
-            sendMessage(event, "Couldn't add/remove emote to server. Emote will work but be lost on Bot restarts if this was an add command");
+            sendMessage(event, "Couldn't remove emote to server. Emote will work but be lost on Bot restarts if this was an add command");
         }
     }
+
 
     private String[] checkAddRemove(MessageReceivedEvent event, String restOfString, boolean add) {
         String[] emoteInfo = restOfString.split(" ");
@@ -420,5 +461,16 @@ public class Bot extends ListenerAdapter {
             return null;
         }
         return emoteInfo;
+    }
+
+    private void resetEmotes(){
+        try {
+            FileWriter writer = new FileWriter(emotesPath);
+            String s = "{\n}";
+            writer.write(s);
+            writer.close();
+        } catch (Exception ignored) {
+
+        }
     }
 }
