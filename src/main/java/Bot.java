@@ -20,16 +20,13 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
-import net.dv8tion.jda.internal.requests.Route;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -38,7 +35,7 @@ import java.util.StringTokenizer;
 
 public class Bot extends ListenerAdapter {
     //Audio manager that is used to manage audio players
-    private AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+    private AudioPlayerManager playerManager;
     //Used for identifying the YouTube URL.
     private static final boolean start = true; //there is a timestamp that we want to start from
     private static final boolean none = false; //there is not a timestamp to start from
@@ -67,8 +64,6 @@ public class Bot extends ListenerAdapter {
             emotesPath = PI_EMOTES_PATH;
         }
         initializeEmotes();
-        System.out.println(fatPath);
-        System.out.println(emotesPath);
     }
 
     private void initializeEmotes() {
@@ -352,6 +347,7 @@ public class Bot extends ListenerAdapter {
                         }
                     }
                     player.playTrack(track);
+                    System.out.println("Playing Track");
                 }
 
                 @Override
@@ -371,8 +367,10 @@ public class Bot extends ListenerAdapter {
             });
             AudioManager manager = guild.getAudioManager();
             manager.setSendingHandler(new AudioPlayerSendHandler(player));
-            if (!manager.isConnected())
+            if (!manager.isConnected() && !manager.isAttemptingToConnect()) {
                 manager.openAudioConnection(channel);
+                System.out.println("Opening Connection");
+            }
         } catch (NullPointerException userNotInVoiceChannel) {
             sendMessage(event, "You are not currently in a voice channel idiot");
         }
