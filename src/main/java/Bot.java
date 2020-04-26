@@ -140,7 +140,7 @@ public class Bot extends ListenerAdapter {
                 fourHead(event);
             else if (msg.contains("!jebaited"))
                 jebaited(event);
-            else if (msg.contains("@!224300400126328834"))
+            else if (msg.contains("224300400126328834"))
                 fat(event);
 
             else if (msg.equals("!init") && event.getAuthor().getId().equals("171091041905147915"))
